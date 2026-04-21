@@ -24,7 +24,6 @@ public class WorkSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

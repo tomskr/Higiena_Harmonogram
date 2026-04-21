@@ -23,13 +23,7 @@ public class HgShifts {
     private Long id;
 
     private LocalTime fullDate;
-    private String year;
-    private String dayOfWeek;
-    private Integer monthNumber;
-    private String monthName;
-    private String shiftType;
     private Boolean isHoliday;
-    private Boolean isWeekend;
 
 
 }
