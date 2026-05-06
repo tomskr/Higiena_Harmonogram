@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Higiena Harmonogram.iml" filepath="$PROJECT_DIR$/Higiena Harmonogram.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HigienaHarmonogramBackend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/HigienaHarmonogramBackend.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/HigienaHarmonogramFrontend/HigienaHarmonogramFrontend.iml" filepath="$PROJECT_DIR$/HigienaHarmonogramFrontend/HigienaHarmonogramFrontend.iml" />
     </modules>
   </component>

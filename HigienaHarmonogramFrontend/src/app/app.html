@@ -74,9 +74,11 @@
   .content {
     display: flex;
     justify-content: space-around;
+    align-items: flex-start;
     width: 100%;
-    max-width: 700px;
+    max-width: 900px;
     margin-bottom: 3rem;
+    gap: 2rem;
   }
 
   .content h1 {
@@ -162,6 +164,31 @@
     fill: var(--gray-900);
   }
 
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-900);
+  }
+
+  .schedule-table th,
+  .schedule-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-400);
+  }
+
+  .schedule-table th {
+    font-weight: 600;
+    color: var(--gray-700);
+    background: color-mix(in srgb, var(--bright-blue) 5%, transparent);
+  }
+
+  .schedule-table tr:hover {
+    background: color-mix(in srgb, var(--bright-blue) 2%, transparent);
+  }
+
   @media screen and (max-width: 650px) {
     .content {
       flex-direction: column;
@@ -182,6 +209,22 @@
     <div class="left-side">
       <h1>Hello, {{ title() }}</h1>
       <p>Tomasz Skrzypek 🎉</p>
+    </div>
+    <div class="right-side">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Shift</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let schedule of workSchedules()">
+            <td>{{ schedule.employee.firstName }} {{ schedule.employee.lastName }}</td>
+            <td>{{ schedule.shift.name }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </main>
