@@ -1,10 +1,6 @@
 
 
 <style>
-   :root {
-     --inter-font: "Inter", system-ui, sans-serif;
-   }
-
   :host {
     --bright-blue: oklch(51.01% 0.274 263.83);
     --electric-violet: oklch(53.18% 0.28 296.97);
@@ -71,13 +67,16 @@
     position: relative;
   }
 
+  .angular-logo {
+    max-width: 9.2rem;
+  }
 
   .content {
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
     width: 100%;
-    /*max-width: 900px;*/
+    max-width: 900px;
     margin-bottom: 3rem;
     gap: 2rem;
   }
@@ -166,12 +165,11 @@
   }
 
   .schedule-table {
-    width: min(100%, 900px);
-    margin: 2rem auto;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    background: #ffffff;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-900);
   }
 
   .schedule-table th,
@@ -208,7 +206,10 @@
 
 <main class="main">
   <div class="content">
-
+    <div class="left-side">
+      <h1>Hello, {{ title() }}</h1>
+      <p>Tomasz Skrzypek 🎉</p>
+    </div>
     <div class="right-side">
       <table class="schedule-table">
         <thead>
@@ -218,20 +219,10 @@
           </tr>
         </thead>
         <tbody>
-
-          @for (employee of employees(); track employee.id) {
-            <tr>
-              <td>{{ employee.firstName }} {{ employee.lastName }}</td>
-
-            </tr>
-            } @empty {
-            <tr>
-              <td colspan="2">No work schedules available.</td>
-            </tr>
-          }
-
-
-
+          <tr *ngFor="let schedule of workSchedules()">
+            <td>{{ schedule.employee.firstName }} {{ schedule.employee.lastName }}</td>
+            <td>{{ schedule.shift.name }}</td>
+          </tr>
         </tbody>
       </table>
     </div>
