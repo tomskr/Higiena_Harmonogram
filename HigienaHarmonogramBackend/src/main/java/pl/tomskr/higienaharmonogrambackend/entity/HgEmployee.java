@@ -22,6 +22,6 @@ public class HgEmployee {
 
     private String firstName;
     private String lastName;
-    private String employeeId; // Unique identifier if needed
+    private String employee_Id; // Unique identifier if needed
 
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+
 
 @Entity
 @Data
@@ -21,7 +21,7 @@ public class HgShifts {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
+    @JoinColumn(name = "employee_id", nullable=false)
     private HgEmployee employee;
 
     private LocalDate fullDate;

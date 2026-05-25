@@ -16,15 +16,24 @@ public class HgShiftsService {
     private final HgShiftsRepository hgShiftsRepository;
     private final HgEmployeeRepository hgEmployeeRepository;
 
+    //Get all shifts and put them in a list
     public List<HgShifts> getAllShifts() {
         return hgShiftsRepository.findAll();
     }
 
+    //Get shift by id and throw exception if not found
     public HgShifts getShiftById(Long id) {
         return hgShiftsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Shift not found with id: " + id));
     }
 
+    //Get shift by employee id and throw exception if not found
+    public List<HgShifts> getShiftsByEmployeeId(Long employeeId) {
+        return hgShiftsRepository.findByEmployeeId(employeeId);
+    }
+
+
+    //Create shift and throw exception if employee id not found
     public HgShifts createShift(HgShifts shift) {
         if (shift.getEmployee() == null || shift.getEmployee().getId() == null) {
             throw new RuntimeException("Employee ID must be provided");
@@ -36,6 +45,7 @@ public class HgShiftsService {
         return hgShiftsRepository.save(shift);
     }
 
+    //Update shift and throw exception if shift id not found
     public HgShifts updateShift(Long id, HgShifts shiftDetails) {
         HgShifts shift = getShiftById(id);
         shift.setFullDate(shiftDetails.getFullDate());
@@ -43,6 +53,7 @@ public class HgShiftsService {
         return hgShiftsRepository.save(shift);
     }
 
+    //Delete shift and throw exception if shift id not found
     public void deleteShift(Long id) {
         HgShifts shift = getShiftById(id);
         hgShiftsRepository.delete(shift);

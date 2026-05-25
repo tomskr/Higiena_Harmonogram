@@ -1,17 +1,13 @@
 package pl.tomskr.higienaharmonogrambackend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -25,12 +21,12 @@ public class WorkSchedule {
     private Long id;
 
 
-    @ManyToOne
+    @OneToMany
     @JoinColumn(name = "employee_id")
-    private HgEmployee employee;
+    private List<HgEmployee> employee;
 
-    @ManyToOne
+    @OneToMany
     @JoinColumn(name = "shift_id")
-    private HgShifts shift;
+    private List<HgShifts> shift;
 
 }

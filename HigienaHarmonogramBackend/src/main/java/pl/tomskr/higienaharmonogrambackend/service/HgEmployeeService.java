@@ -13,27 +13,32 @@ public class HgEmployeeService {
 
     private final HgEmployeeRepository hgEmployeeRepository;
 
+    //Get all employees
     public List<HgEmployee> getAllEmployees() {
         return hgEmployeeRepository.findAll();
     }
 
+    //Get employee by id and throw exception if employee id not found
     public HgEmployee getEmployeeById(Long id) {
         return hgEmployeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
     }
 
+    //Create employee and throw exception if employee id already exists
     public HgEmployee createEmployee(HgEmployee employee) {
         return hgEmployeeRepository.save(employee);
     }
 
+    //Update employee and throw exception if employee id not found
     public HgEmployee updateEmployee(Long id, HgEmployee employeeDetails) {
         HgEmployee employee = getEmployeeById(id);
         employee.setFirstName(employeeDetails.getFirstName());
         employee.setLastName(employeeDetails.getLastName());
-        employee.setEmployeeId(employeeDetails.getEmployeeId());
+        employee.setEmployee_Id(employeeDetails.getEmployee_Id());
         return hgEmployeeRepository.save(employee);
     }
 
+    //Delete employee and throw exception if employee id not found
     public void deleteEmployee(Long id) {
         HgEmployee employee = getEmployeeById(id);
         hgEmployeeRepository.delete(employee);
