@@ -7,6 +7,8 @@ import pl.tomskr.higienaharmonogrambackend.entity.HgShifts;
 import pl.tomskr.higienaharmonogrambackend.repository.HgEmployeeRepository;
 import pl.tomskr.higienaharmonogrambackend.repository.HgShiftsRepository;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
@@ -28,9 +30,12 @@ public class HgShiftsService {
     }
 
     //Get shift by employee id and throw exception if not found
-    public List<HgShifts> getShiftsByEmployeeId(Long employeeId) {
-        return hgShiftsRepository.findByEmployeeId(employeeId);
+    public List<HgShifts> getShiftsByEmployeeId(Long employeeId,int year, int month) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+        return hgShiftsRepository.findByEmployeeIdAndFullDateBetween(employeeId, startDate, endDate);
     }
+
 
 
     //Create shift and throw exception if employee id not found

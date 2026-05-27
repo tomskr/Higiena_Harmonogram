@@ -24,6 +24,9 @@ public class HgShifts {
     @JoinColumn(name = "employee_id", nullable=false)
     private HgEmployee employee;
 
+    private char shiftType;
+    private int shiftLength;
+
     private LocalDate fullDate;
     private Boolean isHoliday;
 
