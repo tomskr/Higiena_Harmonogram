@@ -3,6 +3,7 @@ package pl.tomskr.higienaharmonogrambackend.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.tomskr.higienaharmonogrambackend.entity.HgEmployee;
 import pl.tomskr.higienaharmonogrambackend.entity.HgShifts;
 import pl.tomskr.higienaharmonogrambackend.service.HgShiftsService;
 
@@ -34,6 +35,11 @@ public class HgShiftsController {
     @PutMapping("/{id}")
     public ResponseEntity<HgShifts> updateShift(@PathVariable Long id, @RequestBody HgShifts shiftDetails) {
         return ResponseEntity.ok(hgShiftsService.updateShift(id, shiftDetails));
+    }
+
+    @PostMapping()
+    public ResponseEntity<HgShifts> fillShift(@RequestBody HgEmployee employee) {
+        return ResponseEntity.ok(hgShiftsService.fillShift(employee));
     }
 
     @DeleteMapping("/{id}")

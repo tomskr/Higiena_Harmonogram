@@ -63,4 +63,9 @@ public class HgShiftsService {
         HgShifts shift = getShiftById(id);
         hgShiftsRepository.delete(shift);
     }
+
+    public HgShifts fillShift(HgEmployee employee) {
+        //todo:
+        return null;
+    }
 }
