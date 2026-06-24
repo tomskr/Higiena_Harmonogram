@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Entity representing a work schedule.
+ */
 @Entity
 @Data
 @NoArgsConstructor

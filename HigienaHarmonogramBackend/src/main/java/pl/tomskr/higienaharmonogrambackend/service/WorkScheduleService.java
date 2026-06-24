@@ -7,28 +7,53 @@ import pl.tomskr.higienaharmonogrambackend.repository.WorkScheduleRepository;
 
 import java.util.List;
 
+/**
+ * Service for managing work schedules.
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkScheduleService {
 
     private final WorkScheduleRepository workScheduleRepository;
 
+    /**
+     * Retrieves all work schedules.
+     *
+     * @return a list of all work schedules
+     */
     public List<WorkSchedule> getAllWorkSchedules() {
         return workScheduleRepository.findAll();
     }
 
-    //Get work schedule by id and throw exception if work schedule id not found
+    /**
+     * Retrieves a work schedule by its ID.
+     *
+     * @param id the ID of the work schedule to retrieve
+     * @return the found work schedule
+     * @throws RuntimeException if the work schedule is not found
+     */
     public WorkSchedule getWorkScheduleById(Long id) {
         return workScheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("WorkSchedule not found with id: " + id));
     }
 
-    //Create work schedule and throw exception if work schedule id already exists
+    /**
+     * Creates a new work schedule.
+     *
+     * @param workSchedule the work schedule to create
+     * @return the created work schedule
+     */
     public WorkSchedule createWorkSchedule(WorkSchedule workSchedule) {
         return workScheduleRepository.save(workSchedule);
     }
 
-    //Update work schedule and throw exception if work schedule id not found
+    /**
+     * Updates an existing work schedule.
+     *
+     * @param id the ID of the work schedule to update
+     * @param workScheduleDetails the new details of the work schedule
+     * @return the updated work schedule
+     */
     public WorkSchedule updateWorkSchedule(Long id, WorkSchedule workScheduleDetails) {
         WorkSchedule workSchedule = getWorkScheduleById(id);
         workSchedule.setEmployee(workScheduleDetails.getEmployee());
@@ -36,7 +61,11 @@ public class WorkScheduleService {
         return workScheduleRepository.save(workSchedule);
     }
 
-    //Delete work schedule and throw exception if work schedule id not found
+    /**
+     * Deletes a work schedule by its ID.
+     *
+     * @param id the ID of the work schedule to delete
+     */
     public void deleteWorkSchedule(Long id) {
         WorkSchedule workSchedule = getWorkScheduleById(id);
         workScheduleRepository.delete(workSchedule);

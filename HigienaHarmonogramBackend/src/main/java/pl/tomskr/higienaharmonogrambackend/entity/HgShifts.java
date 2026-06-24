@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 
+/**
+ * Entity representing a shift.
+ */
 @Entity
 @Data
 @NoArgsConstructor

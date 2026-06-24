@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity representing an employee.
+ */
 @Entity
 @Data
 @NoArgsConstructor
