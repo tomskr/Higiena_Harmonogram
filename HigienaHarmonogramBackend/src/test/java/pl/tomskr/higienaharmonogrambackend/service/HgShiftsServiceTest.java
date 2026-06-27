@@ -81,4 +81,56 @@ class HgShiftsServiceTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Employee ID must be provided");
     }
+
+    @Test
+    void shouldThrowExceptionWhenShiftAlreadyExistsForEmployeeOnSameDay() {
+        // Given
+        HgEmployee employee = HgEmployee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .employee_Id("EMP123")
+                .build();
+        HgEmployee savedEmployee = hgEmployeeRepository.save(employee);
+        LocalDate date = LocalDate.now();
+
+        HgShifts shift1 = HgShifts.builder()
+                .employee(HgEmployee.builder().id(savedEmployee.getId()).build())
+                .fullDate(date)
+                .isHoliday(false)
+                .build();
+        hgShiftsService.createShift(shift1);
+
+        HgShifts shift2 = HgShifts.builder()
+                .employee(HgEmployee.builder().id(savedEmployee.getId()).build())
+                .fullDate(date)
+                .isHoliday(false)
+                .build();
+
+        // When & Then
+        assertThatThrownBy(() -> hgShiftsService.createShift(shift2))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Employee already has a shift on this day");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenShiftDateNotProvided() {
+        // Given
+        HgEmployee employee = HgEmployee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .employee_Id("EMP123")
+                .build();
+        HgEmployee savedEmployee = hgEmployeeRepository.save(employee);
+
+        HgShifts shift = HgShifts.builder()
+                .employee(HgEmployee.builder().id(savedEmployee.getId()).build())
+                .fullDate(null)
+                .isHoliday(false)
+                .build();
+
+        // When & Then
+        assertThatThrownBy(() -> hgShiftsService.createShift(shift))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Shift date must be provided");
+    }
 }

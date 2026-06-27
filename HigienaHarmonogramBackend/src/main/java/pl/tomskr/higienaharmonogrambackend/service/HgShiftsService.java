@@ -68,6 +68,16 @@ public class HgShiftsService {
             throw new RuntimeException("Employee ID must be provided");
         }
         Long employeeId = shift.getEmployee().getId();
+        LocalDate shiftDate = shift.getFullDate();
+
+        if (shiftDate == null) {
+            throw new RuntimeException("Shift date must be provided");
+        }
+
+        if (hgShiftsRepository.existsByEmployeeIdAndFullDate(employeeId, shiftDate)) {
+            throw new RuntimeException("Employee already has a shift on this day");
+        }
+
         HgEmployee employee = hgEmployeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + employeeId));
         shift.setEmployee(employee);
@@ -83,6 +93,13 @@ public class HgShiftsService {
      */
     public HgShifts updateShift(Long id, HgShifts shiftDetails) {
         HgShifts shift = getShiftById(id);
+
+        if (shiftDetails.getFullDate() != null && !shiftDetails.getFullDate().equals(shift.getFullDate())) {
+            if (hgShiftsRepository.existsByEmployeeIdAndFullDate(shift.getEmployee().getId(), shiftDetails.getFullDate())) {
+                throw new RuntimeException("Employee already has a shift on this day");
+            }
+        }
+
         shift.setFullDate(shiftDetails.getFullDate());
         shift.setIsHoliday(shiftDetails.getIsHoliday());
         return hgShiftsRepository.save(shift);
@@ -110,14 +127,17 @@ public class HgShiftsService {
             throw new RuntimeException("Employee ID must be provided");
         }
 
-        HgShifts shift = new HgShifts();
         for (int i = 0; i < 3; i++) {
+            HgShifts shift = new HgShifts();
             shift.setEmployee(employee);
             shift.setShiftType('A');
             shift.setShiftLength(8);
             shift.setFullDate(LocalDate.of(2026, 1, i + 1));
             shift.setIsHoliday(false);
-            hgShiftsRepository.save(shift);
+
+            if (!hgShiftsRepository.existsByEmployeeIdAndFullDate(employee.getId(), shift.getFullDate())) {
+                hgShiftsRepository.save(shift);
+            }
         }
         return null;
     }

@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface HgShiftsRepository extends JpaRepository<HgShifts, Long> {
     List<HgShifts> findByEmployeeIdAndFullDateBetween(Long employeeId, LocalDate startDate, LocalDate endDate);
+    boolean existsByEmployeeIdAndFullDate(Long employeeId, LocalDate fullDate);
 }
