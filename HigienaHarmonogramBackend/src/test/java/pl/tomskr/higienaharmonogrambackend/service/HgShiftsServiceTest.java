@@ -33,7 +33,7 @@ class HgShiftsServiceTest {
         HgEmployee employee = HgEmployee.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .employeeId("EMP123")
+                .employee_Id("EMP123")
                 .build();
         HgEmployee savedEmployee = hgEmployeeRepository.save(employee);
 
