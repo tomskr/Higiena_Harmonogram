@@ -2,8 +2,10 @@ package pl.tomskr.higienaharmonogrambackend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.tomskr.higienaharmonogrambackend.entity.HgEmployee;
 import pl.tomskr.higienaharmonogrambackend.repository.HgEmployeeRepository;
+import pl.tomskr.higienaharmonogrambackend.repository.HgShiftsRepository;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class HgEmployeeService {
 
     private final HgEmployeeRepository hgEmployeeRepository;
+    private final HgShiftsRepository hgShiftsRepository;
 
     /**
      * Retrieves all employees.
@@ -44,6 +47,9 @@ public class HgEmployeeService {
      * @return the created employee
      */
     public HgEmployee createEmployee(HgEmployee employee) {
+        if (employee.getEmployee_Id() == null || employee.getEmployee_Id().isEmpty()) {
+            employee.setEmployee_Id("EMP-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
         return hgEmployeeRepository.save(employee);
     }
 
@@ -58,17 +64,24 @@ public class HgEmployeeService {
         HgEmployee employee = getEmployeeById(id);
         employee.setFirstName(employeeDetails.getFirstName());
         employee.setLastName(employeeDetails.getLastName());
-        employee.setEmployee_Id(employeeDetails.getEmployee_Id());
+        if (employeeDetails.getEmployee_Id() != null && !employeeDetails.getEmployee_Id().isEmpty()) {
+            employee.setEmployee_Id(employeeDetails.getEmployee_Id());
+        } else if (employee.getEmployee_Id() == null || employee.getEmployee_Id().isEmpty()) {
+            // Generate only if both current and new are empty/null
+            employee.setEmployee_Id("EMP-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
         return hgEmployeeRepository.save(employee);
     }
 
     /**
-     * Deletes an employee by their ID.
+     * Deletes an employee by their ID and all associated shifts.
      *
      * @param id the ID of the employee to delete
      */
+    @Transactional
     public void deleteEmployee(Long id) {
         HgEmployee employee = getEmployeeById(id);
+        hgShiftsRepository.deleteByEmployeeId(id);
         hgEmployeeRepository.delete(employee);
     }
 }

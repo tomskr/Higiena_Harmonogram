@@ -50,7 +50,7 @@ public class HgShiftsService {
      * @param month the month
      * @return a list of shifts matching the criteria
      */
-    public List<HgShifts> getShiftsByEmployeeId(Long employeeId,int year, int month) {
+    public List<HgShifts>  getShiftsByEmployeeId(Long employeeId,int year, int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
         return hgShiftsRepository.findByEmployeeIdAndFullDateBetween(employeeId, startDate, endDate);
