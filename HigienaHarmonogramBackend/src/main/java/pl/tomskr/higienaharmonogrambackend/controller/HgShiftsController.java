@@ -64,15 +64,16 @@ public class HgShiftsController {
         return ResponseEntity.ok(hgShiftsService.updateShift(id, shiftDetails));
     }
 
+
     /**
-     * Fills a shift with available employees.
+     * Fills shifts for all employees between the earliest and latest months found.
      *
-     * @param id the ID of the shift to fill
-     * @return the updated shift
+     * @return a 200 OK response
      */
-    @PostMapping("/fill/{id}")
-    public ResponseEntity<HgShifts> fillShift(@PathVariable Long id) {
-        return ResponseEntity.ok(hgShiftsService.fillShift(id));
+    @PostMapping("/fill")
+    public ResponseEntity<Void> fillShifts() {
+        hgShiftsService.fillShifts();
+        return ResponseEntity.ok().build();
     }
 
     /**

@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
+import java.util.Optional;
+
 /**
  * Service for managing shifts.
  */
@@ -116,29 +118,48 @@ public class HgShiftsService {
     }
 
     /**
-     * Fills shifts for a given employee (placeholder implementation).
-     *
-     * @param id the ID of the employee
-     * @return null (as per current implementation)
+     * Fills shifts for all employees between the earliest and latest months found in existing shifts.
      */
-    public HgShifts fillShift(Long id) {
-        HgEmployee employee = hgEmployeeRepository.findById(id).orElse(null);
-        if (employee == null || employee.getId() == null) {
-            throw new RuntimeException("Employee ID must be provided");
+    public void fillShifts() {
+        if(hgShiftsRepository.count() == 0) {
+            throw new RuntimeException("There are no shifts in the database");
         }
 
-        for (int i = 0; i < 3; i++) {
-            HgShifts shift = new HgShifts();
-            shift.setEmployee(employee);
-            shift.setShiftType('A');
-            shift.setShiftLength(8);
-            shift.setFullDate(LocalDate.of(2026, 1, i + 1));
-            shift.setIsHoliday(false);
+        Optional<HgShifts> earliestShift = hgShiftsRepository.findFirstByOrderByFullDateAsc();
+        Optional<HgShifts> latestShift = hgShiftsRepository.findFirstByOrderByFullDateDesc();
 
-            if (!hgShiftsRepository.existsByEmployeeIdAndFullDate(employee.getId(), shift.getFullDate())) {
-                hgShiftsRepository.save(shift);
-            }
+        if (earliestShift.isEmpty() || latestShift.isEmpty()) {
+            return;
         }
-        return null;
+
+        LocalDate startDate = earliestShift.get().getFullDate().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endDate = latestShift.get().getFullDate().with(TemporalAdjusters.lastDayOfMonth());
+
+        List<HgEmployee> employees = hgEmployeeRepository.findAll();
+
+        for (HgEmployee employee : employees) {
+            fillEmployeeShifts(employee, startDate, endDate);
+        }
     }
+
+    /**
+     * Fills shifts for a given employee between startDate and endDate.
+     */
+    private void fillEmployeeShifts(HgEmployee employee, LocalDate startDate, LocalDate endDate) {
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            if (!hgShiftsRepository.existsByEmployeeIdAndFullDate(employee.getId(), currentDate)) {
+                HgShifts newShift = HgShifts.builder()
+                        .employee(employee)
+                        .shiftType('A')
+                        .shiftLength(8)
+                        .fullDate(currentDate)
+                        .isHoliday(false)
+                        .build();
+                hgShiftsRepository.save(newShift);
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+    }
+
 }

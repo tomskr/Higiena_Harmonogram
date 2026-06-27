@@ -8,11 +8,16 @@ import pl.tomskr.higienaharmonogrambackend.entity.HgShifts;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.util.Optional;
+
 //Repository for HgShifts entity
 @Repository
 public interface HgShiftsRepository extends JpaRepository<HgShifts, Long> {
     List<HgShifts> findByEmployeeIdAndFullDateBetween(Long employeeId, LocalDate startDate, LocalDate endDate);
     boolean existsByEmployeeIdAndFullDate(Long employeeId, LocalDate fullDate);
+
+    Optional<HgShifts> findFirstByOrderByFullDateAsc();
+    Optional<HgShifts> findFirstByOrderByFullDateDesc();
 
     @Transactional
     void deleteByEmployeeId(Long employeeId);
