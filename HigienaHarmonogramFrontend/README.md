@@ -1,16 +1,29 @@
-# HigienaHarmonogramFrontend
+# Higiena Harmonogram Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.
+This is the frontend component of the Higiena Harmonogram application, built with Angular.
 
 ## Development server
 
 To start a local development server, run:
 
 ```bash
-ng serve
+npm start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+## Backend Connection
+
+This frontend is configured to communicate with the backend via a proxy. The proxy settings are defined in `proxy.conf.json`.
+
+- **Backend URL**: `http://localhost:8080`
+- **Proxy Path**: All requests starting with `/api` are forwarded to the backend.
+
+## Project Structure
+
+- `src/app`: Contains the main application components, services, and routes.
+- `src/assets`: Static assets like images and styles.
+- `proxy.conf.json`: Configuration for the development proxy.
 
 ## Code scaffolding
 
