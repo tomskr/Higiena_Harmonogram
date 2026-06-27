@@ -104,6 +104,8 @@ public class HgShiftsService {
 
         shift.setFullDate(shiftDetails.getFullDate());
         shift.setIsHoliday(shiftDetails.getIsHoliday());
+        shift.setShiftType(shiftDetails.getShiftType());
+        shift.setShiftLength(shiftDetails.getShiftLength());
         return hgShiftsRepository.save(shift);
     }
 
@@ -121,10 +123,6 @@ public class HgShiftsService {
      * Fills shifts for all employees between the earliest and latest months found in existing shifts.
      */
     public void fillShifts() {
-        if(hgShiftsRepository.count() == 0) {
-            throw new RuntimeException("There are no shifts in the database");
-        }
-
         Optional<HgShifts> earliestShift = hgShiftsRepository.findFirstByOrderByFullDateAsc();
         Optional<HgShifts> latestShift = hgShiftsRepository.findFirstByOrderByFullDateDesc();
 
