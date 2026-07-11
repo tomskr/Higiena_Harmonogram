@@ -18,25 +18,36 @@
     </div>
 
     <div *ngIf="employees().length > 0" class="list">
-      <div *ngFor="let employee of employees()" class="employee-card">
-        <div class="employee-header">
-          <div class="employee-info">
-            <h3>{{ employee.firstName }} {{ employee.lastName }}</h3>
-            <div class="employee-details">
-              <p *ngIf="employee.email"><strong>Email:</strong> {{ employee.email }}</p>
-              <p *ngIf="employee.phone"><strong>Telefon:</strong> {{ employee.phone }}</p>
-              <p *ngIf="employee.position"><strong>Stanowisko:</strong> {{ employee.position }}</p>
-              <p *ngIf="employee.id"><strong>ID:</strong> {{ employee.id }}</p>
-            </div>
-          </div>
-          <button 
-            class="btn-delete" 
-            (click)="deleteEmployee(employee.id)" 
-            title="Usuń pracownika">
-            🗑️
-          </button>
-        </div>
-      </div>
+      <table class="employees-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee ID</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            *ngFor="let employee of employees()" 
+            class="employee-row"
+            [routerLink]="['/employee', employee.id]">
+            <td class="cell-id">{{ employee.id }}</td>
+            <td class="cell-employee-id">{{ employee.employee_Id }}</td>
+            <td class="cell-firstname">{{ employee.firstName }}</td>
+            <td class="cell-lastname">{{ employee.lastName }}</td>
+            <td class="cell-actions" (click)="$event.stopPropagation()">
+              <button 
+                class="btn-delete" 
+                (click)="deleteEmployee(employee.id)" 
+                title="Usuń pracownika">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -75,24 +86,14 @@
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="employee_Id">Employee ID *</label>
         <input
-          type="email"
-          id="email"
-          [(ngModel)]="formData().email"
-          name="email"
-          placeholder="Wpisz email"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="phone">Telefon</label>
-        <input
-          type="tel"
-          id="phone"
-          [(ngModel)]="formData().phone"
-          name="phone"
-          placeholder="Wpisz numer telefonu"
+          type="text"
+          id="employee_Id"
+          [(ngModel)]="formData().employee_Id"
+          name="employee_Id"
+          placeholder="Wpisz unikatowy identyfikator pracownika"
+          required
         />
       </div>
 

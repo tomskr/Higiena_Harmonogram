@@ -1,12 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { HttpService } from '../servies/HttpService';
 
 @Component({
   selector: 'app-employees-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './employees-list.html',
   styleUrl: './employees-list.css'
 })
@@ -22,8 +23,7 @@ export class EmployeesListComponent implements OnInit {
   protected formData = signal({
     firstName: '',
     lastName: '',
-    email: '',
-    phone: ''
+    employee_Id: ''
   });
 
   ngOnInit() {
@@ -49,8 +49,7 @@ export class EmployeesListComponent implements OnInit {
     this.formData.set({
       firstName: '',
       lastName: '',
-      email: '',
-      phone: ''
+      employee_Id: ''
     });
   }
 
@@ -61,8 +60,8 @@ export class EmployeesListComponent implements OnInit {
   addEmployee() {
     const data = this.formData();
     
-    if (!data.firstName || !data.lastName) {
-      alert('Imię i nazwisko są wymagane!');
+    if (!data.firstName || !data.lastName || !data.employee_Id) {
+      alert('Imię, nazwisko i Employee ID są wymagane!');
       return;
     }
 
