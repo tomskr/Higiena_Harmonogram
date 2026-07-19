@@ -1,0 +1,109 @@
+<div class="employees-container">
+  <div class="header">
+    <h1>Lista pracowników</h1>
+    <button (click)="openModal()" class="btn-add">➕ Dodaj pracownika</button>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading">
+    <p>Ładowanie pracowników...</p>
+  </div>
+
+  <div *ngIf="error()" class="error">
+    <p>{{ error() }}</p>
+  </div>
+
+  <div *ngIf="!isLoading() && !error()" class="employees-list">
+    <div *ngIf="employees().length === 0" class="no-employees">
+      <p>Brak pracowników w systemie</p>
+    </div>
+
+    <div *ngIf="employees().length > 0" class="list">
+      <table class="employees-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee ID</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            *ngFor="let employee of employees()" 
+            class="employee-row"
+            [routerLink]="['/employee', employee.id]">
+            <td class="cell-id">{{ employee.id }}</td>
+            <td class="cell-employee-id">{{ employee.employee_Id }}</td>
+            <td class="cell-firstname">{{ employee.firstName }}</td>
+            <td class="cell-lastname">{{ employee.lastName }}</td>
+            <td class="cell-actions" (click)="$event.stopPropagation()">
+              <button 
+                class="btn-delete" 
+                (click)="deleteEmployee(employee.id)" 
+                title="Usuń pracownika">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal()" class="modal-overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Dodaj nowego pracownika</h2>
+      <button class="btn-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="addEmployee()" class="modal-form">
+      <div class="form-group">
+        <label for="firstName">Imię *</label>
+        <input
+          type="text"
+          id="firstName"
+          [(ngModel)]="formData().firstName"
+          name="firstName"
+          placeholder="Wpisz imię"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Nazwisko *</label>
+        <input
+          type="text"
+          id="lastName"
+          [(ngModel)]="formData().lastName"
+          name="lastName"
+          placeholder="Wpisz nazwisko"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="employee_Id">Employee ID *</label>
+        <input
+          type="text"
+          id="employee_Id"
+          [(ngModel)]="formData().employee_Id"
+          name="employee_Id"
+          placeholder="Wpisz unikatowy identyfikator pracownika"
+          required
+        />
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeModal()">Anuluj</button>
+        <button type="submit" class="btn btn-submit" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Dodawanie...' : 'Dodaj pracownika' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

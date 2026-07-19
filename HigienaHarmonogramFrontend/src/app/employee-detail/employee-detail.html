@@ -1,0 +1,113 @@
+<div class="employee-detail-container">
+  <a routerLink="/employees" class="back-link">← Wróć do listy</a>
+
+  <div *ngIf="isLoading()" class="loading">
+    <p>Ładowanie danych pracownika...</p>
+  </div>
+
+  <div *ngIf="error()" class="error">
+    <p>{{ error() }}</p>
+  </div>
+
+  <div *ngIf="!isLoading() && !error() && employee()" class="detail-content">
+    <div class="left-panel">
+      <div class="employee-photo">
+        <div class="photo-placeholder">📷</div>
+      </div>
+
+      <div class="employee-info">
+        <h2>{{ employee().firstName }} {{ employee().lastName }}</h2>
+        <div class="info-details">
+          <p><strong>ID:</strong> {{ employee().id }}</p>
+          <p><strong>Employee ID:</strong> {{ employee().employee_Id }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="calendar">
+        <div class="calendar-header">
+          <button class="month-nav" (click)="previousMonth()">◀</button>
+          <h3>{{ monthYear }}</h3>
+          <button class="month-nav" (click)="nextMonth()">▶</button>
+        </div>
+
+        <div class="calendar-weekdays">
+          <div class="weekday">Pn</div>
+          <div class="weekday">Wt</div>
+          <div class="weekday">Śr</div>
+          <div class="weekday">Cz</div>
+          <div class="weekday">Pt</div>
+          <div class="weekday">Sb</div>
+          <div class="weekday">Nd</div>
+        </div>
+
+        <div class="calendar-days">
+          <div 
+            *ngFor="let day of daysInMonth" 
+            [class.day]="day !== 0"
+            [class.empty]="day === 0"
+            [class.today]="isToday(day)"
+            [class.sunday]="isSunday(day)"
+            (click)="day !== 0 && openShiftModal(day)">
+            {{ day !== 0 ? day : '' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Shift Modal -->
+<div *ngIf="showShiftModal()" class="modal-overlay" (click)="closeShiftModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Dodaj zmianę</h2>
+      <button class="btn-close" (click)="closeShiftModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="addShift()" class="modal-form">
+      <div class="form-group">
+        <label for="date">Data</label>
+        <input
+          type="text"
+          id="date"
+          [value]="selectedDate() ? selectedDate()!.toLocaleDateString('pl-PL') : ''"
+          disabled
+          class="disabled-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="shiftType">Typ zmiany *</label>
+        <input
+          type="text"
+          id="shiftType"
+          [(ngModel)]="shiftFormData().shiftType"
+          name="shiftType"
+          placeholder="Np. u8, u11, noc"
+          required
+        />
+      </div>
+
+      <div class="form-group checkbox">
+        <label for="isHoliday">
+          <input
+            type="checkbox"
+            id="isHoliday"
+            [(ngModel)]="shiftFormData().isHoliday"
+            name="isHoliday"
+          />
+          Jest dniem wolnym
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeShiftModal()">Anuluj</button>
+        <button type="submit" class="btn btn-submit" [disabled]="isSubmittingShift()">
+          {{ isSubmittingShift() ? 'Dodawanie...' : 'Dodaj zmianę' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
