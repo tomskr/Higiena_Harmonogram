@@ -43,8 +43,8 @@
         </div>
 
         <div class="calendar-days">
-          <div 
-            *ngFor="let day of daysInMonth" 
+          <div
+            *ngFor="let day of daysInMonth"
             [class.day]="day !== 0"
             [class.empty]="day === 0"
             [class.today]="isToday(day)"
@@ -85,7 +85,19 @@
           id="shiftType"
           [(ngModel)]="shiftFormData().shiftType"
           name="shiftType"
-          placeholder="Np. u8, u11, noc"
+          placeholder="Np. u, u, n"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="shiftLength">Długość zmiany *</label>
+        <input
+          type="text"
+          id="shiftLength"
+          [(ngModel)]="shiftFormData().shiftLength"
+          name="shiftLength"
+          placeholder="Np. 8"
           required
         />
       </div>

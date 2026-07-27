@@ -25,6 +25,7 @@ export class EmployeeDetailComponent implements OnInit {
 
   protected shiftFormData = signal({
     shiftType: '',
+    shiftLength: '',
     isHoliday: false
   });
 
@@ -58,7 +59,7 @@ export class EmployeeDetailComponent implements OnInit {
     // Konwertuj getDay() (0=niedziela) na indeks gdzie poniedziałek=0, niedziela=6
     const adjustedFirstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
     const daysCount = new Date(year, month + 1, 0).getDate();
-    
+
     const days: number[] = [];
     // Dodaj puste dni na początku (do poniedziałku)
     for (let i = 0; i < adjustedFirstDay; i++) {
@@ -72,7 +73,7 @@ export class EmployeeDetailComponent implements OnInit {
   }
 
   get monthYear(): string {
-    const months = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 
+    const months = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
                     'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
     const year = this.currentDate().getFullYear();
     const month = months[this.currentDate().getMonth()];
@@ -94,8 +95,8 @@ export class EmployeeDetailComponent implements OnInit {
   isToday(day: number): boolean {
     if (day === 0) return false;
     const today = new Date();
-    return day === today.getDate() && 
-           this.currentDate().getMonth() === today.getMonth() && 
+    return day === today.getDate() &&
+           this.currentDate().getMonth() === today.getMonth() &&
            this.currentDate().getFullYear() === today.getFullYear();
   }
 
@@ -107,16 +108,17 @@ export class EmployeeDetailComponent implements OnInit {
 
   openShiftModal(day: number) {
     if (day === 0) return;
-    
+
     const date = new Date(this.currentDate().getFullYear(), this.currentDate().getMonth(), day);
     this.selectedDate.set(date);
-    
+
     const isHoliday = this.isSunday(day);
     this.shiftFormData.set({
       shiftType: '',
+      shiftLength: '',
       isHoliday: isHoliday
     });
-    
+
     this.showShiftModal.set(true);
   }
 
@@ -134,10 +136,16 @@ export class EmployeeDetailComponent implements OnInit {
       return;
     }
 
+    if (!formData.shiftLength || !empId || !this.selectedDate()) {
+      alert('Dłuugość zmiany jest wymagana!');
+      return;
+    }
+
     this.isSubmittingShift.set(true);
 
     const shiftData = {
       shiftType: formData.shiftType,
+      shiftLength: formData.shiftLength,
       isHoliday: formData.isHoliday,
       fullDate: this.selectedDate()?.toISOString().split('T')[0],
       employee: { id: empId }
