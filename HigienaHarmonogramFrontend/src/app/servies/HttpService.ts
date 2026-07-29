@@ -28,4 +28,8 @@ export class HttpService {
   addShift(shift: any): Observable<any> {
     return this.http.post(this.shiftsUrl, shift);
   }
+
+  updateShift(shift: any): Observable<any> {
+    return this.http.put(this.shiftsUrl, shift);
+  }
 }

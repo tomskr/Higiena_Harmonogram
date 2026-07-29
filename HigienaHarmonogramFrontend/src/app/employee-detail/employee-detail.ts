@@ -151,7 +151,7 @@ export class EmployeeDetailComponent implements OnInit {
       employee: { id: empId }
     };
 
-    this.httpService.addShift(shiftData).subscribe({
+    this.httpService.updateShift(shiftData).subscribe({
       next: () => {
         this.isSubmittingShift.set(false);
         this.closeShiftModal();
