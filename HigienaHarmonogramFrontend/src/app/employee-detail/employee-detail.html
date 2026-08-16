@@ -49,8 +49,12 @@
             [class.empty]="day === 0"
             [class.today]="isToday(day)"
             [class.sunday]="isSunday(day)"
+            [class.shift-assigned]="hasShiftOnDay(day)"
             (click)="day !== 0 && openShiftModal(day)">
-            {{ day !== 0 ? day : '' }}
+            <span *ngIf="day !== 0" class="day-content">
+              <span class="day-number">{{ day }}</span>
+              <span *ngIf="hasShiftOnDay(day)" class="shift-tag">{{ getShiftTypeOnDay(day) }}</span>
+            </span>
           </div>
         </div>
       </div>

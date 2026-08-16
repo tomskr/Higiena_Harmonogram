@@ -13,6 +13,10 @@ export class HttpService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
+  getShifts(): Observable<any[]> {
+    return this.http.get<any[]>(this.shiftsUrl);
+  }
+
   getEmployeeById(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
@@ -29,7 +33,7 @@ export class HttpService {
     return this.http.post(this.shiftsUrl, shift);
   }
 
-  updateShift(shift: any): Observable<any> {
-    return this.http.put(this.shiftsUrl, shift);
+  updateShift(id: number, shift: any): Observable<any> {
+    return this.http.put(`${this.shiftsUrl}/${id}`, shift);
   }
 }

@@ -1,0 +1,48 @@
+<div class="schedule-container">
+  <a routerLink="/" class="back-link">← Wróć do strony głównej</a>
+
+  <div class="schedule-header">
+    <h1>Harmonogram pracowników</h1>
+    <div class="month-navigation">
+      <button class="month-nav" (click)="previousWeek()">◀ Poprzedni tydzień</button>
+      <h2>{{ monthYear }}</h2>
+      <button class="month-nav" (click)="nextWeek()">Następny tydzień ▶</button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading">
+    <p>Ładowanie harmonogramu...</p>
+  </div>
+
+  <div *ngIf="error()" class="error">
+    <p>{{ error() }}</p>
+  </div>
+
+  <div *ngIf="!isLoading() && !error()" class="schedule-table-wrapper">
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th class="employee-column">Pracownik</th>
+          <th *ngFor="let day of currentWeekDates; let i = index" class="day-header">
+            <div class="day-title">{{ weekDays[i] }}</div>
+            <div class="day-date">{{ formatDate(day) }}</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let employee of employees()" class="employee-row">
+          <td class="employee-cell">
+            <div class="employee-name">{{ employee.firstName }} {{ employee.lastName }}</div>
+            <div class="employee-id">{{ employee.employee_Id }}</div>
+          </td>
+          <td *ngFor="let day of currentWeekDates" class="shift-cell" [class.has-shift]="!!getShiftForDay(employee.id, day)">
+            <ng-container *ngIf="getShiftForDay(employee.id, day) as shift; else noShift">
+              <span class="shift-badge">{{ shift.shiftType }}</span>
+            </ng-container>
+            <ng-template #noShift>-</ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

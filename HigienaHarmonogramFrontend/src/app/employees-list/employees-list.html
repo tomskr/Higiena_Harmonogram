@@ -1,7 +1,10 @@
 <div class="employees-container">
   <div class="header">
     <h1>Lista pracowników</h1>
-    <button (click)="openModal()" class="btn-add">➕ Dodaj pracownika</button>
+    <div class="header-buttons">
+      <button (click)="openModal()" class="btn-add">➕ Dodaj pracownika</button>
+      <a routerLink="/schedule" class="btn-schedule">📅 Harmonogram</a>
+    </div>
   </div>
 
   <div *ngIf="isLoading()" class="loading">

@@ -19,6 +19,11 @@ This frontend is configured to communicate with the backend via a proxy. The pro
 - **Backend URL**: `http://localhost:8080`
 - **Proxy Path**: All requests starting with `/api` are forwarded to the backend.
 
+CMD to start backend
+```bash
+.\gradlew bootRun
+```
+
 ## Project Structure
 
 - `src/app`: Contains the main application components, services, and routes.

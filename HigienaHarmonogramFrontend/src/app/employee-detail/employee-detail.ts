@@ -16,6 +16,7 @@ export class EmployeeDetailComponent implements OnInit {
   private httpService = inject(HttpService);
 
   protected employee = signal<any>(null);
+  protected employeeShifts = signal<any[]>([]);
   protected isLoading = signal(true);
   protected error = signal<string | null>(null);
   protected currentDate = signal(new Date());
@@ -42,12 +43,33 @@ export class EmployeeDetailComponent implements OnInit {
     this.httpService.getEmployeeById(id).subscribe({
       next: (data) => {
         this.employee.set(data);
-        this.isLoading.set(false);
+        this.loadEmployeeShifts();
       },
       error: (err) => {
         this.error.set('Błąd przy ładowaniu danych pracownika');
         this.isLoading.set(false);
         console.error('Error fetching employee:', err);
+      }
+    });
+  }
+
+  private loadEmployeeShifts() {
+    const employeeId = this.employee()?.id;
+    if (!employeeId) {
+      this.isLoading.set(false);
+      return;
+    }
+
+    this.httpService.getShifts().subscribe({
+      next: (shifts) => {
+        this.employeeShifts.set(
+          shifts.filter((shift) => Number(shift?.employee?.id ?? shift?.employeeId) === Number(employeeId))
+        );
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading employee shifts:', err);
+        this.isLoading.set(false);
       }
     });
   }
@@ -106,6 +128,49 @@ export class EmployeeDetailComponent implements OnInit {
     return date.getDay() === 0;
   }
 
+  private formatDateKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  hasShiftOnDay(day: number): boolean {
+    if (day === 0) return false;
+
+    const targetDate = new Date(
+      this.currentDate().getFullYear(),
+      this.currentDate().getMonth(),
+      day
+    );
+
+    const targetKey = this.formatDateKey(targetDate);
+
+    return this.employeeShifts().some((shift) => {
+      const shiftDate = shift?.fullDate ? String(shift.fullDate).substring(0, 10) : null;
+      return shiftDate === targetKey;
+    });
+  }
+
+  getShiftTypeOnDay(day: number): string {
+    if (day === 0) return '';
+
+    const targetDate = new Date(
+      this.currentDate().getFullYear(),
+      this.currentDate().getMonth(),
+      day
+    );
+
+    const targetKey = this.formatDateKey(targetDate);
+
+    const shift = this.employeeShifts().find((item) => {
+      const shiftDate = item?.fullDate ? String(item.fullDate).substring(0, 10) : null;
+      return shiftDate === targetKey;
+    });
+
+    return shift?.shiftType ?? '';
+  }
+
   openShiftModal(day: number) {
     if (day === 0) return;
 
@@ -127,6 +192,13 @@ export class EmployeeDetailComponent implements OnInit {
     this.selectedDate.set(null);
   }
 
+  private formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   addShift() {
     const formData = this.shiftFormData();
     const empId = this.employee()?.id;
@@ -145,13 +217,13 @@ export class EmployeeDetailComponent implements OnInit {
 
     const shiftData = {
       shiftType: formData.shiftType,
-      shiftLength: formData.shiftLength,
+      shiftLength: Number(formData.shiftLength),
       isHoliday: formData.isHoliday,
-      fullDate: this.selectedDate()?.toISOString().split('T')[0],
+      fullDate: this.formatLocalDate(this.selectedDate()!),
       employee: { id: empId }
     };
 
-    this.httpService.updateShift(shiftData).subscribe({
+    this.httpService.addShift(shiftData).subscribe({
       next: () => {
         this.isSubmittingShift.set(false);
         this.closeShiftModal();
