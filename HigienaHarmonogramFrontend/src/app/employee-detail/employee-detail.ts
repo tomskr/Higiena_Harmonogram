@@ -26,6 +26,16 @@ export class EmployeeDetailComponent implements OnInit {
   protected selectedDate = signal<Date | null>(null);
   protected selectedShiftId = signal<number | null>(null);
   protected isSubmittingShift = signal(false);
+  protected showEditEmployeeModal = signal(false);
+  protected isSubmittingEmployee = signal(false);
+  protected employeeFormData = signal({
+    firstName: '',
+    lastName: '',
+    employee_Id: '',
+    photo: ''
+  });
+  protected employeePhotoPreview = signal<string>('');
+  protected selectedEmployeePhotoName = signal<string>('Nie wybrano pliku');
 
   protected shiftFormData = signal({
     shiftType: '',
@@ -56,6 +66,96 @@ export class EmployeeDetailComponent implements OnInit {
         this.error.set('Błąd przy ładowaniu danych pracownika');
         this.isLoading.set(false);
         console.error('Error fetching employee:', err);
+      }
+    });
+  }
+
+  editEmployee() {
+    const employee = this.employee();
+    if (!employee) {
+      return;
+    }
+
+    this.showEditEmployeeModal.set(true);
+    this.employeeFormData.set({
+      firstName: employee.firstName ?? '',
+      lastName: employee.lastName ?? '',
+      employee_Id: employee.employee_Id ?? '',
+      photo: employee.photo ?? ''
+    });
+    this.employeePhotoPreview.set(employee.photo ?? '');
+    this.selectedEmployeePhotoName.set(employee.photo ? 'Zdjęcie zapisane' : 'Nie wybrano pliku');
+  }
+
+  closeEditEmployeeModal() {
+    this.showEditEmployeeModal.set(false);
+    this.isSubmittingEmployee.set(false);
+    this.employeeFormData.set({
+      firstName: '',
+      lastName: '',
+      employee_Id: '',
+      photo: ''
+    });
+    this.employeePhotoPreview.set('');
+    this.selectedEmployeePhotoName.set('Nie wybrano pliku');
+  }
+
+  onEmployeePhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      this.selectedEmployeePhotoName.set('Nie wybrano pliku');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.toastr.error('Wybierz poprawny plik graficzny.');
+      this.selectedEmployeePhotoName.set('Nie wybrano pliku');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      this.employeeFormData.update((current) => ({ ...current, photo: result }));
+      this.employeePhotoPreview.set(result);
+      this.selectedEmployeePhotoName.set(file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  saveEmployeeEdit() {
+    const employee = this.employee();
+    const data = { ...this.employeeFormData() };
+
+    if (!employee) {
+      return;
+    }
+
+    if (!data.firstName || !data.lastName || !data.employee_Id) {
+      this.toastr.error('Imię, nazwisko i Employee ID są wymagane!');
+      return;
+    }
+
+    if (!data.photo) {
+      delete (data as { photo?: string }).photo;
+    }
+
+    this.isSubmittingEmployee.set(true);
+
+    this.httpService.updateEmployee(employee.id, data).subscribe({
+      next: () => {
+        this.isSubmittingEmployee.set(false);
+        this.closeEditEmployeeModal();
+        this.loadEmployee(employee.id);
+        this.toastr.success('Dane pracownika zapisane pomyślnie!');
+      },
+      error: (err) => {
+        this.isSubmittingEmployee.set(false);
+        this.toastr.error('Błąd przy zapisywaniu pracownika');
+        console.error('Error updating employee:', err);
       }
     });
   }

@@ -15,9 +15,17 @@
   margin: 0 auto;
 }
 
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
 .back-link {
   display: inline-block;
-  margin-bottom: 1.5rem;
   color: var(--bright-blue);
   text-decoration: none;
   font-weight: 500;
@@ -27,6 +35,27 @@
 .back-link:hover {
   color: var(--electric-violet);
   transform: translateX(-4px);
+}
+
+.btn-edit-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--bright-blue), var(--electric-violet));
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(99, 102, 241, 0.2);
+  transition: box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-edit-page:hover {
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.28);
+  filter: brightness(1.02);
 }
 
 .loading,
@@ -45,14 +74,16 @@
 
 .detail-content {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 2rem;
+  min-height: 0;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .employee-photo {
@@ -107,16 +138,24 @@
 
 .right-panel {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
+  min-width: 0;
+  flex: 1;
 }
 
 .calendar {
   width: 100%;
+  min-width: 0;
+  min-height: 360px;
+  max-height: calc(100vh - 200px);
   background: white;
   border: 1px solid color-mix(in srgb, var(--bright-blue) 15%, transparent);
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 4px 12px color-mix(in srgb, var(--bright-blue) 10%, transparent);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .calendar-header {
@@ -170,13 +209,15 @@
 
 .calendar-days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
   gap: 0.5rem;
+  flex: 1;
+  min-height: clamp(260px, 42vh, 520px);
 }
 
 .day,
 .empty {
-  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,6 +228,8 @@
   cursor: pointer;
   border: 1px solid transparent;
   position: relative;
+  min-height: 0;
+  height: 100%;
 }
 
 .day {
@@ -441,7 +484,8 @@
 }
 
 @media screen and (max-width: 1024px) {
-    grid-template-columns: 250px 1fr;
+  .detail-content {
+    grid-template-columns: 250px minmax(0, 1fr);
     gap: 1.5rem;
   }
 
@@ -449,7 +493,7 @@
     position: sticky;
     top: 2rem;
   }
-
+}
 
 @media screen and (max-width: 768px) {
   .employee-detail-container {
@@ -467,6 +511,8 @@
 
   .calendar {
     padding: 1rem;
+    max-height: none;
+    min-height: 300px;
   }
 
   .calendar-header {
@@ -476,5 +522,9 @@
 
   .calendar-header h3 {
     min-width: 100%;
+  }
+
+  .calendar-days {
+    min-height: 280px;
   }
 }
