@@ -202,6 +202,12 @@
   min-width: 100px;
   font-weight: 500;
   color: var(--bright-blue);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.shift-cell:hover {
+  background: color-mix(in srgb, var(--bright-blue) 8%, white);
 }
 
 .shift-cell.has-shift {
@@ -227,6 +233,127 @@
 .shift-cell:empty::before {
   content: '-';
   color: var(--gray-400);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1000;
+}
+
+.modal {
+  width: min(100%, 420px);
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--gray-900);
+}
+
+.btn-close {
+  border: none;
+  background: transparent;
+  color: var(--gray-700);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.modal-form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--gray-900);
+  font-size: 0.875rem;
+}
+
+.form-group input {
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.95rem;
+  color: var(--gray-900);
+  background: white;
+}
+
+.form-group input:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.2);
+  border-color: var(--bright-blue);
+}
+
+.disabled-input {
+  background: #f3f4f6;
+  color: var(--gray-700);
+}
+
+.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+}
+
+.checkbox input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: #eef2ff;
+  color: var(--gray-900);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--bright-blue), var(--electric-violet));
+  color: #fff;
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 @media screen and (max-width: 1024px) {

@@ -35,7 +35,11 @@
             <div class="employee-name">{{ employee.firstName }} {{ employee.lastName }}</div>
             <div class="employee-id">{{ employee.employee_Id }}</div>
           </td>
-          <td *ngFor="let day of currentWeekDates" class="shift-cell" [class.has-shift]="!!getShiftForDay(employee.id, day)">
+          <td
+            *ngFor="let day of currentWeekDates"
+            class="shift-cell"
+            [class.has-shift]="!!getShiftForDay(employee.id, day)"
+            (click)="openShiftModal(employee.id, day)">
             <ng-container *ngIf="getShiftForDay(employee.id, day) as shift; else noShift">
               <span class="shift-badge">{{ shift.shiftType }}</span>
             </ng-container>
@@ -44,5 +48,81 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div *ngIf="showShiftModal()" class="modal-overlay" (click)="closeShiftModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edytuj zmianę' : 'Dodaj zmianę' }}</h2>
+      <button class="btn-close" (click)="closeShiftModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="saveShift()" class="modal-form">
+      <div class="form-group">
+        <label for="scheduleEmployee">Pracownik</label>
+        <input
+          type="text"
+          id="scheduleEmployee"
+          [value]="employees().find(employee => employee.id === selectedEmployeeId()) ? (employees().find(employee => employee.id === selectedEmployeeId())?.firstName + ' ' + employees().find(employee => employee.id === selectedEmployeeId())?.lastName) : ''"
+          disabled
+          class="disabled-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="scheduleDate">Data</label>
+        <input
+          type="text"
+          id="scheduleDate"
+          [value]="selectedDate() ? selectedDate()!.toLocaleDateString('pl-PL') : ''"
+          disabled
+          class="disabled-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="scheduleShiftType">Typ zmiany *</label>
+        <input
+          type="text"
+          id="scheduleShiftType"
+          [(ngModel)]="shiftFormData().shiftType"
+          name="scheduleShiftType"
+          placeholder="Np. u, n"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="scheduleShiftLength">Długość zmiany *</label>
+        <input
+          type="text"
+          id="scheduleShiftLength"
+          [(ngModel)]="shiftFormData().shiftLength"
+          name="scheduleShiftLength"
+          placeholder="Np. 8"
+          required
+        />
+      </div>
+
+      <div class="form-group checkbox">
+        <label for="scheduleHoliday">
+          <input
+            type="checkbox"
+            id="scheduleHoliday"
+            [(ngModel)]="shiftFormData().isHoliday"
+            name="scheduleHoliday"
+          />
+          Jest dniem wolnym
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeShiftModal()">Anuluj</button>
+        <button type="submit" class="btn btn-submit" [disabled]="isSubmittingShift()">
+          {{ isSubmittingShift() ? (isEditMode ? 'Zapisywanie...' : 'Dodawanie...') : (isEditMode ? 'Zapisz zmiany' : 'Dodaj zmianę') }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

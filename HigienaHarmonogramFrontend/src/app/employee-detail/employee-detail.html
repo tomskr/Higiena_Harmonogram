@@ -1,7 +1,10 @@
 <div class="employee-detail-container">
   <div class="top-bar">
     <a routerLink="/employees" class="back-link">← Wróć do listy</a>
-    <button type="button" class="btn btn-edit-page" (click)="editEmployee()">✏️ Edytuj pracownika</button>
+    <div class="top-bar-actions">
+      <a routerLink="/schedule" class="btn btn-schedule-page">📅 Harmonogram</a>
+      <button type="button" class="btn btn-edit-page" (click)="editEmployee()">✏️ Edytuj pracownika</button>
+    </div>
   </div>
 
   <div *ngIf="isLoading()" class="loading">

@@ -24,6 +24,13 @@
   flex-wrap: wrap;
 }
 
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .back-link {
   display: inline-block;
   color: var(--bright-blue);
@@ -37,7 +44,7 @@
   transform: translateX(-4px);
 }
 
-.btn-edit-page {
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -45,15 +52,21 @@
   padding: 0.75rem 1.1rem;
   border: none;
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, var(--bright-blue), var(--electric-violet));
-  color: white;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(99, 102, 241, 0.2);
+  text-decoration: none;
   transition: box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-.btn-edit-page:hover {
+.btn-edit-page,
+.btn-schedule-page {
+  background: linear-gradient(135deg, var(--bright-blue), var(--electric-violet));
+  color: white;
+  box-shadow: 0 8px 18px rgba(99, 102, 241, 0.2);
+}
+
+.btn-edit-page:hover,
+.btn-schedule-page:hover {
   box-shadow: 0 10px 20px rgba(99, 102, 241, 0.28);
   filter: brightness(1.02);
 }
