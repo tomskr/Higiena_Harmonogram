@@ -254,9 +254,15 @@
   border-color: var(--electric-violet);
 }
 
-.sunday {
-  background: color-mix(in srgb, #ff9a56 8%, transparent);
-  border: 1px solid #ff9a56;
+.sunday,
+.holiday-day {
+  background: #ffe5e5 !important;
+  border: 1px solid #dc2626 !important;
+  color: #991b1b !important;
+}
+
+.holiday-day .shift-tag {
+  background: #dc2626;
 }
 
 .sunday:hover {

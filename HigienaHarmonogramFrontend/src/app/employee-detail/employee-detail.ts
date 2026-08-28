@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { HttpService } from '../servies/HttpService';
 
 @Component({
@@ -14,6 +15,7 @@ import { HttpService } from '../servies/HttpService';
 export class EmployeeDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private httpService = inject(HttpService);
+  private toastr = inject(ToastrService);
 
   protected employee = signal<any>(null);
   protected employeeShifts = signal<any[]>([]);
@@ -22,6 +24,7 @@ export class EmployeeDetailComponent implements OnInit {
   protected currentDate = signal(new Date());
   protected showShiftModal = signal(false);
   protected selectedDate = signal<Date | null>(null);
+  protected selectedShiftId = signal<number | null>(null);
   protected isSubmittingShift = signal(false);
 
   protected shiftFormData = signal({
@@ -29,6 +32,10 @@ export class EmployeeDetailComponent implements OnInit {
     shiftLength: '',
     isHoliday: false
   });
+
+  protected get isEditMode(): boolean {
+    return this.selectedShiftId() !== null;
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -128,6 +135,24 @@ export class EmployeeDetailComponent implements OnInit {
     return date.getDay() === 0;
   }
 
+  isHolidayOnDay(day: number): boolean {
+    if (day === 0) return false;
+
+    const targetDate = new Date(
+      this.currentDate().getFullYear(),
+      this.currentDate().getMonth(),
+      day
+    );
+
+    const targetKey = this.formatDateKey(targetDate);
+    const shift = this.employeeShifts().find((item) => {
+      const shiftDate = item?.fullDate ? String(item.fullDate).substring(0, 10) : null;
+      return shiftDate === targetKey;
+    });
+
+    return Boolean(shift?.isHoliday) || this.isSunday(day);
+  }
+
   private formatDateKey(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -171,17 +196,29 @@ export class EmployeeDetailComponent implements OnInit {
     return shift?.shiftType ?? '';
   }
 
+  private getShiftForSelectedDate(date: Date): any | undefined {
+    const targetKey = this.formatDateKey(date);
+
+    return this.employeeShifts().find((shift) => {
+      const shiftDate = shift?.fullDate ? String(shift.fullDate).substring(0, 10) : null;
+      return shiftDate === targetKey;
+    });
+  }
+
   openShiftModal(day: number) {
     if (day === 0) return;
 
     const date = new Date(this.currentDate().getFullYear(), this.currentDate().getMonth(), day);
     this.selectedDate.set(date);
 
-    const isHoliday = this.isSunday(day);
+    const existingShift = this.getShiftForSelectedDate(date);
+    this.selectedShiftId.set(existingShift?.id ?? null);
+
+    const isHoliday = existingShift?.isHoliday ?? this.isSunday(day);
     this.shiftFormData.set({
-      shiftType: '',
-      shiftLength: '',
-      isHoliday: isHoliday
+      shiftType: existingShift ? String(existingShift.shiftType ?? '') : '',
+      shiftLength: existingShift ? String(existingShift.shiftLength ?? '') : '',
+      isHoliday: Boolean(isHoliday)
     });
 
     this.showShiftModal.set(true);
@@ -190,6 +227,12 @@ export class EmployeeDetailComponent implements OnInit {
   closeShiftModal() {
     this.showShiftModal.set(false);
     this.selectedDate.set(null);
+    this.selectedShiftId.set(null);
+    this.shiftFormData.set({
+      shiftType: '',
+      shiftLength: '',
+      isHoliday: false
+    });
   }
 
   private formatLocalDate(date: Date): string {
@@ -199,17 +242,18 @@ export class EmployeeDetailComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  addShift() {
+  saveShift() {
     const formData = this.shiftFormData();
     const empId = this.employee()?.id;
+    const shiftId = this.selectedShiftId();
 
     if (!formData.shiftType || !empId || !this.selectedDate()) {
-      alert('Typ zmiany jest wymagany!');
+      this.toastr.error('Typ zmiany jest wymagany!');
       return;
     }
 
     if (!formData.shiftLength || !empId || !this.selectedDate()) {
-      alert('Dłuugość zmiany jest wymagana!');
+      this.toastr.error('Długość zmiany jest wymagana!');
       return;
     }
 
@@ -223,16 +267,21 @@ export class EmployeeDetailComponent implements OnInit {
       employee: { id: empId }
     };
 
-    this.httpService.addShift(shiftData).subscribe({
+    const request = shiftId !== null
+      ? this.httpService.updateShift(shiftId, shiftData)
+      : this.httpService.addShift(shiftData);
+
+    request.subscribe({
       next: () => {
         this.isSubmittingShift.set(false);
+        this.loadEmployeeShifts();
         this.closeShiftModal();
-        alert('Zmiana dodana pomyślnie!');
+        this.toastr.success(shiftId !== null ? 'Zmiany zapisane pomyślnie!' : 'Zmiana dodana pomyślnie!');
       },
       error: (err) => {
         this.isSubmittingShift.set(false);
-        alert('Błąd przy dodawaniu zmiany');
-        console.error('Error adding shift:', err);
+        this.toastr.error(shiftId !== null ? 'Błąd przy zapisywaniu zmiany' : 'Błąd przy dodawaniu zmiany');
+        console.error('Error saving shift:', err);
       }
     });
   }

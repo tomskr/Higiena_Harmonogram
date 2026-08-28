@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { HttpService } from '../servies/HttpService';
 
 @Component({
@@ -13,13 +14,15 @@ import { HttpService } from '../servies/HttpService';
 })
 export class EmployeesListComponent implements OnInit {
   private httpService = inject(HttpService);
+  private toastr = inject(ToastrService);
 
   protected employees = signal<any[]>([]);
   protected isLoading = signal(true);
   protected error = signal<string | null>(null);
   protected showModal = signal(false);
   protected isSubmitting = signal(false);
-  
+  protected editingEmployeeId = signal<number | null>(null);
+
   protected formData = signal({
     firstName: '',
     lastName: '',
@@ -44,8 +47,20 @@ export class EmployeesListComponent implements OnInit {
     });
   }
 
-  openModal() {
+  openModal(employee?: any) {
     this.showModal.set(true);
+
+    if (employee) {
+      this.editingEmployeeId.set(employee.id);
+      this.formData.set({
+        firstName: employee.firstName ?? '',
+        lastName: employee.lastName ?? '',
+        employee_Id: employee.employee_Id ?? ''
+      });
+      return;
+    }
+
+    this.editingEmployeeId.set(null);
     this.formData.set({
       firstName: '',
       lastName: '',
@@ -55,29 +70,40 @@ export class EmployeesListComponent implements OnInit {
 
   closeModal() {
     this.showModal.set(false);
+    this.editingEmployeeId.set(null);
+    this.formData.set({
+      firstName: '',
+      lastName: '',
+      employee_Id: ''
+    });
   }
 
-  addEmployee() {
+  saveEmployee() {
     const data = this.formData();
-    
+    const employeeId = this.editingEmployeeId();
+
     if (!data.firstName || !data.lastName || !data.employee_Id) {
-      alert('Imię, nazwisko i Employee ID są wymagane!');
+      this.toastr.error('Imię, nazwisko i Employee ID są wymagane!');
       return;
     }
 
     this.isSubmitting.set(true);
-    
-    this.httpService.addEmployee(data).subscribe({
+
+    const request = employeeId !== null
+      ? this.httpService.updateEmployee(employeeId, data)
+      : this.httpService.addEmployee(data);
+
+    request.subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.closeModal();
         this.loadEmployees();
-        alert('Pracownik dodany pomyślnie!');
+        this.toastr.success(employeeId !== null ? 'Dane pracownika zapisane pomyślnie!' : 'Pracownik dodany pomyślnie!');
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        alert('Błąd przy dodawaniu pracownika');
-        console.error('Error adding employee:', err);
+        this.toastr.error(employeeId !== null ? 'Błąd przy zapisywaniu pracownika' : 'Błąd przy dodawaniu pracownika');
+        console.error('Error saving employee:', err);
       }
     });
   }
@@ -92,10 +118,10 @@ export class EmployeesListComponent implements OnInit {
     this.httpService.deleteEmployee(employeeId).subscribe({
       next: () => {
         this.loadEmployees();
-        alert('Pracownik usunięty pomyślnie!');
+        this.toastr.success('Pracownik usunięty pomyślnie!');
       },
       error: (err) => {
-        alert('Błąd przy usuwaniu pracownika');
+        this.toastr.error('Błąd przy usuwaniu pracownika');
         console.error('Error deleting employee:', err);
       }
     });

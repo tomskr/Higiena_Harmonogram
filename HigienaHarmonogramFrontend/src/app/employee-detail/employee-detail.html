@@ -49,6 +49,7 @@
             [class.empty]="day === 0"
             [class.today]="isToday(day)"
             [class.sunday]="isSunday(day)"
+            [class.holiday-day]="isHolidayOnDay(day)"
             [class.shift-assigned]="hasShiftOnDay(day)"
             (click)="day !== 0 && openShiftModal(day)">
             <span *ngIf="day !== 0" class="day-content">
@@ -66,11 +67,11 @@
 <div *ngIf="showShiftModal()" class="modal-overlay" (click)="closeShiftModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Dodaj zmianę</h2>
+      <h2>{{ isEditMode ? 'Edytuj zmianę' : 'Dodaj zmianę' }}</h2>
       <button class="btn-close" (click)="closeShiftModal()">✕</button>
     </div>
 
-    <form (ngSubmit)="addShift()" class="modal-form">
+    <form (ngSubmit)="saveShift()" class="modal-form">
       <div class="form-group">
         <label for="date">Data</label>
         <input
@@ -121,7 +122,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel" (click)="closeShiftModal()">Anuluj</button>
         <button type="submit" class="btn btn-submit" [disabled]="isSubmittingShift()">
-          {{ isSubmittingShift() ? 'Dodawanie...' : 'Dodaj zmianę' }}
+          {{ isSubmittingShift() ? (isEditMode ? 'Zapisywanie...' : 'Dodawanie...') : (isEditMode ? 'Zapisz zmiany' : 'Dodaj zmianę') }}
         </button>
       </div>
     </form>

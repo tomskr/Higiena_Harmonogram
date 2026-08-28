@@ -25,6 +25,10 @@ export class HttpService {
     return this.http.post(this.apiUrl, employee);
   }
 
+  updateEmployee(id: number, employee: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, employee);
+  }
+
   deleteEmployee(employeeId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${employeeId}`);
   }

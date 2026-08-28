@@ -1,1 +1,26 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'ngx-toastr/toastr';
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.toast-container {
+  z-index: 9999;
+}
+
+#toast-container > div {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  border-radius: 12px;
+}
+
+.toast-success {
+  background-color: #1f9d55 !important;
+  color: white !important;
+}
+
+.toast-error {
+  background-color: #d93025 !important;
+  color: white !important;
+}
