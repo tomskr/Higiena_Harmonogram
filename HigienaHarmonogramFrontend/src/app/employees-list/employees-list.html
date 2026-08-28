@@ -70,45 +70,75 @@
     </div>
 
     <form (ngSubmit)="saveEmployee()" class="modal-form">
-      <div class="form-group">
-        <label for="firstName">Imię *</label>
-        <input
-          type="text"
-          id="firstName"
-          [(ngModel)]="formData().firstName"
-          name="firstName"
-          placeholder="Wpisz imię"
-          required
-        />
-      </div>
+      <div class="form-layout">
+        <div class="form-fields">
+          <div class="form-group">
+            <label for="firstName">Imię *</label>
+            <input
+              type="text"
+              id="firstName"
+              [(ngModel)]="formData().firstName"
+              name="firstName"
+              placeholder="Wpisz imię"
+              required
+            />
+          </div>
 
-      <div class="form-group">
-        <label for="lastName">Nazwisko *</label>
-        <input
-          type="text"
-          id="lastName"
-          [(ngModel)]="formData().lastName"
-          name="lastName"
-          placeholder="Wpisz nazwisko"
-          required
-        />
-      </div>
+          <div class="form-group">
+            <label for="lastName">Nazwisko *</label>
+            <input
+              type="text"
+              id="lastName"
+              [(ngModel)]="formData().lastName"
+              name="lastName"
+              placeholder="Wpisz nazwisko"
+              required
+            />
+          </div>
 
-      <div class="form-group">
-        <label for="employee_Id">Employee ID *</label>
-        <input
-          type="text"
-          id="employee_Id"
-          [(ngModel)]="formData().employee_Id"
-          name="employee_Id"
-          placeholder="Wpisz unikatowy identyfikator pracownika"
-          required
-        />
+          <div class="form-group">
+            <label for="employee_Id">Employee ID *</label>
+            <input
+              type="text"
+              id="employee_Id"
+              [(ngModel)]="formData().employee_Id"
+              name="employee_Id"
+              placeholder="Wpisz unikatowy identyfikator pracownika"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-photo">
+          <label for="employeePhoto">Zdjęcie pracownika</label>
+          <div class="photo-picker">
+            <img
+              *ngIf="photoPreview()"
+              [src]="photoPreview()"
+              alt="Podgląd zdjęcia pracownika"
+              class="photo-preview"
+            />
+            <div *ngIf="!photoPreview()" class="photo-placeholder">📷</div>
+
+            <div class="upload-control">
+              <input
+                type="file"
+                id="employeePhoto"
+                accept="image/*"
+                (change)="onPhotoSelected($event)"
+                class="file-input"
+              />
+              <label for="employeePhoto" class="file-trigger">Wybierz zdjęcie</label>
+              <div class="selected-file-name">{{ selectedPhotoName() }}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel" (click)="closeModal()">Anuluj</button>
         <button type="submit" class="btn btn-submit" [disabled]="isSubmitting()">
+          <span class="btn-icon">{{ editingEmployeeId() !== null ? '💾' : '＋' }}</span>
           {{ isSubmitting() ? (editingEmployeeId() !== null ? 'Zapisywanie...' : 'Dodawanie...') : (editingEmployeeId() !== null ? 'Zapisz zmiany' : 'Dodaj pracownika') }}
         </button>
       </div>

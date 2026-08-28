@@ -267,52 +267,158 @@ h1 {
   padding: 1.5rem;
 }
 
+.form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(200px, 0.9fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+}
+
 .form-group {
   margin-bottom: 1.25rem;
 }
 
-.form-group label {
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label,
+.form-photo label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--gray-900);
   font-size: 0.875rem;
+  width: 80%;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.8rem 0.9rem;
   border: 1px solid color-mix(in srgb, var(--gray-400) 50%, transparent);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   box-sizing: border-box;
   font-family: inherit;
+  background: #fff;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: var(--bright-blue);
   background: color-mix(in srgb, var(--bright-blue) 2%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bright-blue) 10%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bright-blue) 10%, transparent);
+}
+
+.form-photo {
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  min-height: 220px;
+  padding: 1rem;
+  border: 1.5px dashed color-mix(in srgb, var(--bright-blue) 35%, transparent);
+  border-radius: 1rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bright-blue) 8%, transparent), color-mix(in srgb, #8b5cf6 6%, transparent));
+}
+
+.photo-preview,
+.photo-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 1rem;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  color: var(--gray-700);
+  font-size: 2.5rem;
+}
+
+.upload-control {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  background: linear-gradient(135deg, var(--bright-blue), var(--electric-violet));
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(99, 102, 241, 0.2);
+  transition: box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.file-trigger:hover {
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
+  filter: brightness(1.02);
+}
+
+.selected-file-name {
+  min-height: 1.25rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--gray-700);
+  word-break: break-word;
 }
 
 .modal-footer {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  padding: 1.5rem;
+  align-items: center;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
   border-top: 1px solid var(--gray-400);
 }
 
 .btn {
-  padding: 0.75rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.25rem;
   border: none;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  font-size: 0.875rem;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.btn-icon {
+  font-size: 1rem;
 }
 
 .btn-cancel {
@@ -322,23 +428,22 @@ h1 {
 }
 
 .btn-cancel:hover {
-  background: color-mix(in srgb, var(--gray-400) 50%, transparent);
+  background: color-mix(in srgb, var(--gray-400) 45%, transparent);
 }
 
 .btn-submit {
-  background: var(--bright-blue);
+  background: linear-gradient(135deg, var(--bright-blue), var(--electric-violet));
   color: white;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background: var(--electric-violet);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--bright-blue) 30%, transparent);
+  box-shadow: 0 10px 22px rgba(99, 102, 241, 0.28);
 }
 
 .btn-submit:disabled {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 @media screen and (max-width: 768px) {
@@ -363,6 +468,22 @@ h1 {
 
   .modal {
     width: 95%;
+  }
+
+  .form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .photo-picker {
+    min-height: 180px;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
   }
 
   .employees-table {

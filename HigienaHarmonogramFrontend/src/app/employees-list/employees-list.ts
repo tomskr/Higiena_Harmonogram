@@ -26,8 +26,12 @@ export class EmployeesListComponent implements OnInit {
   protected formData = signal({
     firstName: '',
     lastName: '',
-    employee_Id: ''
+    employee_Id: '',
+    photo: ''
   });
+
+  protected photoPreview = signal<string>('');
+  protected selectedPhotoName = signal<string>('Nie wybrano pliku');
 
   ngOnInit() {
     this.loadEmployees();
@@ -52,11 +56,14 @@ export class EmployeesListComponent implements OnInit {
 
     if (employee) {
       this.editingEmployeeId.set(employee.id);
+      const photo = employee.photo ?? '';
       this.formData.set({
         firstName: employee.firstName ?? '',
         lastName: employee.lastName ?? '',
-        employee_Id: employee.employee_Id ?? ''
+        employee_Id: employee.employee_Id ?? '',
+        photo
       });
+      this.photoPreview.set(photo);
       return;
     }
 
@@ -64,8 +71,11 @@ export class EmployeesListComponent implements OnInit {
     this.formData.set({
       firstName: '',
       lastName: '',
-      employee_Id: ''
+      employee_Id: '',
+      photo: ''
     });
+    this.photoPreview.set('');
+    this.selectedPhotoName.set('Nie wybrano pliku');
   }
 
   closeModal() {
@@ -74,17 +84,50 @@ export class EmployeesListComponent implements OnInit {
     this.formData.set({
       firstName: '',
       lastName: '',
-      employee_Id: ''
+      employee_Id: '',
+      photo: ''
     });
+    this.photoPreview.set('');
+    this.selectedPhotoName.set('Nie wybrano pliku');
+  }
+
+  onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      this.selectedPhotoName.set('Nie wybrano pliku');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.toastr.error('Wybierz poprawny plik graficzny.');
+      this.selectedPhotoName.set('Nie wybrano pliku');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      this.formData.update((current) => ({ ...current, photo: result }));
+      this.photoPreview.set(result);
+      this.selectedPhotoName.set(file.name);
+    };
+    reader.readAsDataURL(file);
   }
 
   saveEmployee() {
-    const data = this.formData();
+    const data = { ...this.formData() };
     const employeeId = this.editingEmployeeId();
 
     if (!data.firstName || !data.lastName || !data.employee_Id) {
       this.toastr.error('Imię, nazwisko i Employee ID są wymagane!');
       return;
+    }
+
+    if (!data.photo) {
+      delete (data as { photo?: string }).photo;
     }
 
     this.isSubmitting.set(true);
