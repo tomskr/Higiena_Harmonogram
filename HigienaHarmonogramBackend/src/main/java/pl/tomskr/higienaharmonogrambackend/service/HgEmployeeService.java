@@ -64,6 +64,7 @@ public class HgEmployeeService {
         HgEmployee employee = getEmployeeById(id);
         employee.setFirstName(employeeDetails.getFirstName());
         employee.setLastName(employeeDetails.getLastName());
+        employee.setPhoto(employeeDetails.getPhoto());
         if (employeeDetails.getEmployee_Id() != null && !employeeDetails.getEmployee_Id().isEmpty()) {
             employee.setEmployee_Id(employeeDetails.getEmployee_Id());
         } else if (employee.getEmployee_Id() == null || employee.getEmployee_Id().isEmpty()) {
