@@ -18,7 +18,8 @@
   <div *ngIf="!isLoading() && !error() && employee()" class="detail-content">
     <div class="left-panel">
       <div class="employee-photo">
-        <div class="photo-placeholder">📷</div>
+        <img *ngIf="employee() && employee().photo" [src]="employee().photo" alt="Zdjęcie pracownika" class="employee-photo-img" />
+        <div *ngIf="!employee() || !employee().photo" class="photo-placeholder">📷</div>
       </div>
 
       <div class="employee-info">
