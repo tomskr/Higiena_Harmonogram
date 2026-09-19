@@ -33,6 +33,13 @@ export class ScheduleComponent implements OnInit {
     isHoliday: false
   });
 
+  // Multi-day add UI state (frontend-only, no backend calls)
+  protected showMultiDayModal = signal(false);
+  protected multiSelectedDates = signal<string[]>([]);
+  protected multiSelectionMode = signal<'week' | 'month' | 'range'>('week');
+  protected multiVisibleMonth = signal<Date>(new Date(this.currentDate()));
+  protected multiShiftFormData = signal({ shiftType: '', shiftLength: '', isHoliday: false });
+
   protected weekDays = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb', 'Nd'];
 
   protected get isEditMode(): boolean {
@@ -218,5 +225,125 @@ export class ScheduleComponent implements OnInit {
 
   formatDate(date: Date): string {
     return `${date.getDate()}/${date.getMonth() + 1}`;
+  }
+
+  /* Multi-day modal helpers */
+  startMultiDayAdd(employeeId: number) {
+    this.selectedEmployeeId.set(employeeId);
+    // default to current month view and select current week
+    this.multiVisibleMonth.set(new Date(this.currentDate()));
+    const weekDates = this.currentWeekDates.map(d => this.formatLocalDate(d));
+    this.multiSelectedDates.set(weekDates);
+    this.multiSelectionMode.set('week');
+    this.multiShiftFormData.set({ shiftType: '', shiftLength: '', isHoliday: false });
+    this.showMultiDayModal.set(true);
+  }
+
+  closeMultiDayModal() {
+    this.showMultiDayModal.set(false);
+    this.multiSelectedDates.set([]);
+  }
+
+  private dateKey(date: Date): string {
+    return this.formatLocalDate(date);
+  }
+
+  getMonthGrid(monthDate: Date): (Date | null)[] {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const firstWeekday = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday=0
+
+    const cells: (Date | null)[] = [];
+    for (let i = 0; i < firstWeekday; i++) cells.push(null);
+
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+      cells.push(new Date(year, month, d));
+    }
+
+    // pad to full weeks
+    while (cells.length % 7 !== 0) cells.push(null);
+    return cells;
+  }
+
+  toggleMultiDate(date: Date) {
+    const key = this.dateKey(date);
+    const list = [...this.multiSelectedDates()];
+    const idx = list.indexOf(key);
+    if (idx >= 0) list.splice(idx, 1);
+    else list.push(key);
+    this.multiSelectedDates.set(list.sort());
+  }
+
+  isMultiDateSelected(date: Date): boolean {
+    return this.multiSelectedDates().includes(this.dateKey(date));
+  }
+
+  selectMultiMonth() {
+    const month = this.multiVisibleMonth();
+    const year = month.getFullYear();
+    const last = new Date(year, month.getMonth() + 1, 0).getDate();
+    const arr: string[] = [];
+    for (let d = 1; d <= last; d++) {
+      arr.push(this.formatLocalDate(new Date(year, month.getMonth(), d)));
+    }
+    this.multiSelectedDates.set(arr);
+    this.multiSelectionMode.set('month');
+  }
+
+  selectMultiWeek(weekStartDate: Date) {
+    const start = new Date(weekStartDate);
+    const arr: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      arr.push(this.formatLocalDate(d));
+    }
+    this.multiSelectedDates.set(arr);
+    this.multiSelectionMode.set('week');
+  }
+
+  prevMultiMonth() {
+    const d = new Date(this.multiVisibleMonth());
+    d.setMonth(d.getMonth() - 1);
+    this.multiVisibleMonth.set(d);
+    this.multiSelectedDates.set([]);
+  }
+
+  nextMultiMonth() {
+    const d = new Date(this.multiVisibleMonth());
+    d.setMonth(d.getMonth() + 1);
+    this.multiVisibleMonth.set(d);
+    this.multiSelectedDates.set([]);
+  }
+
+  saveMultiDayShifts() {
+    const empId = this.selectedEmployeeId();
+    if (!empId) {
+      this.toastr.error('Nie wybrano pracownika');
+      return;
+    }
+
+    const form = this.multiShiftFormData();
+    if (!form.shiftType || !form.shiftLength) {
+      this.toastr.error('Typ i długość zmiany są wymagane');
+      return;
+    }
+
+    const existing = [...this.shifts()];
+    const toAdd = this.multiSelectedDates().map(dStr => ({
+      id: Math.floor(Math.random() * 1000000) + Date.now(),
+      shiftType: form.shiftType,
+      shiftLength: Number(form.shiftLength),
+      isHoliday: Boolean(form.isHoliday),
+      fullDate: dStr,
+      employee: { id: empId }
+    }));
+
+    // Update local state only (no backend call as requested)
+    this.shifts.set([...existing, ...toAdd]);
+    this.toastr.success(`Dodano ${toAdd.length} zmian(y) (lokalnie)`);
+    this.closeMultiDayModal();
   }
 }

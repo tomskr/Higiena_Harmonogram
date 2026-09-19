@@ -26,6 +26,7 @@ public class HgEmployee {
 
     private String firstName;
     private String lastName;
+    private String photo;
 
     @Column(nullable = false, unique = true)
     private String employee_Id; // Unique identifier if needed

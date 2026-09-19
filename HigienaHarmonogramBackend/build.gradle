@@ -37,6 +37,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    // Hibernate uses JBoss Logging during EntityManagerFactory startup.
+    // Keep it explicit so IDE and Gradle runtime classpaths include it reliably.
+    implementation 'org.jboss.logging:jboss-logging'
     implementation 'org.xerial:sqlite-jdbc:3.50.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects'
     compileOnly 'org.projectlombok:lombok'

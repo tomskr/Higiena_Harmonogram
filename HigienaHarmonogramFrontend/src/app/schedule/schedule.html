@@ -23,6 +23,7 @@
       <thead>
         <tr>
           <th class="employee-column">Pracownik</th>
+          <th class="actions-column">Akcje</th>
           <th *ngFor="let day of currentWeekDates; let i = index" class="day-header">
             <div class="day-title">{{ weekDays[i] }}</div>
             <div class="day-date">{{ formatDate(day) }}</div>
@@ -34,6 +35,9 @@
           <td class="employee-cell">
             <div class="employee-name">{{ employee.firstName }} {{ employee.lastName }}</div>
             <div class="employee-id">{{ employee.employee_Id }}</div>
+          </td>
+          <td class="actions-cell">
+            <button class="btn btn-add-range" (click)="startMultiDayAdd(employee.id); $event.stopPropagation()">Dodaj zmianę</button>
           </td>
           <td
             *ngFor="let day of currentWeekDates"
@@ -48,6 +52,64 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Multi-day modal -->
+<div *ngIf="showMultiDayModal()" class="modal-overlay" (click)="closeMultiDayModal()">
+  <div class="modal multi-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Dodaj zmiany wielodniowe</h2>
+      <button class="btn-close" (click)="closeMultiDayModal()">✕</button>
+    </div>
+
+    <div class="modal-form multi-form">
+      <div class="multi-controls">
+        <div class="month-nav-row">
+          <button class="month-nav" (click)="prevMultiMonth()">◀</button>
+          <div class="month-label">{{ multiVisibleMonth().toLocaleString('pl-PL', { month: 'long', year: 'numeric' }) }}</div>
+          <button class="month-nav" (click)="nextMultiMonth()">▶</button>
+        </div>
+
+        <div class="selection-actions">
+          <button class="btn" (click)="selectMultiMonth()">Zaznacz miesiąc</button>
+          <button class="btn" (click)="multiSelectedDates.set([])">Wyczyść</button>
+          <div class="hint">Kliknij ikonę przy numerze tygodnia, aby zaznaczyć cały tydzień.</div>
+        </div>
+      </div>
+
+      <div class="month-grid">
+        <div class="weekday" *ngFor="let wd of weekDays">{{ wd }}</div>
+        <div *ngFor="let cell of getMonthGrid(multiVisibleMonth()); let i = index" class="month-cell" [class.empty]="!cell" [class.selected]="cell && isMultiDateSelected(cell)" (click)="cell && toggleMultiDate(cell)">
+          <span *ngIf="cell">{{ cell.getDate() }}</span>
+          <button *ngIf="cell && i % 7 === 0" class="week-select-btn" (click)="selectMultiWeek(cell); $event.stopPropagation()">W</button>
+        </div>
+      </div>
+
+      <div class="multi-form-fields">
+        <div class="form-group">
+          <label for="multiShiftType">Typ zmiany *</label>
+          <input id="multiShiftType" [(ngModel)]="multiShiftFormData().shiftType" name="multiShiftType" />
+        </div>
+
+        <div class="form-group">
+          <label for="multiShiftLength">Długość zmiany *</label>
+          <input id="multiShiftLength" [(ngModel)]="multiShiftFormData().shiftLength" name="multiShiftLength" />
+        </div>
+
+        <div class="form-group checkbox">
+          <label for="multiHoliday">
+            <input id="multiHoliday" type="checkbox" [(ngModel)]="multiShiftFormData().isHoliday" name="multiHoliday" />
+            Jest dniem wolnym
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-cancel" (click)="closeMultiDayModal()">Anuluj</button>
+          <button class="btn btn-submit" (click)="saveMultiDayShifts()">Zapisz zmiany dla wybranych dni</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
