@@ -39,6 +39,9 @@ export class ScheduleComponent implements OnInit {
   protected multiSelectionMode = signal<'week' | 'month' | 'range'>('week');
   protected multiVisibleMonth = signal<Date>(new Date(this.currentDate()));
   protected multiShiftFormData = signal({ shiftType: '', shiftLength: '', isHoliday: false });
+  protected isMultiDragging = signal(false);
+  protected multiDragStart = signal<string | null>(null);
+  protected multiDragMoved = signal(false);
 
   protected weekDays = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb', 'Nd'];
 
@@ -48,7 +51,24 @@ export class ScheduleComponent implements OnInit {
 
   ngOnInit() {
     this.loadScheduleData();
+    document.addEventListener('keydown', this.handleEscapeKey);
+    document.addEventListener('pointerup', this.finishMultiDrag);
   }
+
+  private handleEscapeKey = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') {
+      return;
+    }
+
+    if (this.showMultiDayModal()) {
+      this.closeMultiDayModal();
+      return;
+    }
+
+    if (this.showShiftModal()) {
+      this.closeShiftModal();
+    }
+  };
 
   private loadScheduleData() {
     this.httpService.getEmployees().subscribe({
@@ -227,14 +247,37 @@ export class ScheduleComponent implements OnInit {
     return `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
+  formatMonthLabel(date: Date): string {
+    const monthNames = [
+      'styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
+      'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'
+    ];
+    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+  }
+
+  formatDateLabel(date: Date): string {
+    const monthNames = [
+      'styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
+      'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'
+    ];
+    return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+  }
+
+  getSelectedEmployeeName(): string {
+    const employee = this.employees().find(emp => emp.id === this.selectedEmployeeId());
+    if (!employee) {
+      return '';
+    }
+    return `${employee.firstName} ${employee.lastName}`;
+  }
+
   /* Multi-day modal helpers */
   startMultiDayAdd(employeeId: number) {
     this.selectedEmployeeId.set(employeeId);
-    // default to current month view and select current week
+    // default to the current day only; selecting the whole week is a misleading default
     this.multiVisibleMonth.set(new Date(this.currentDate()));
-    const weekDates = this.currentWeekDates.map(d => this.formatLocalDate(d));
-    this.multiSelectedDates.set(weekDates);
-    this.multiSelectionMode.set('week');
+    this.multiSelectedDates.set([this.formatLocalDate(new Date(this.currentDate()))]);
+    this.multiSelectionMode.set('range');
     this.multiShiftFormData.set({ shiftType: '', shiftLength: '', isHoliday: false });
     this.showMultiDayModal.set(true);
   }
@@ -242,6 +285,16 @@ export class ScheduleComponent implements OnInit {
   closeMultiDayModal() {
     this.showMultiDayModal.set(false);
     this.multiSelectedDates.set([]);
+    this.isMultiDragging.set(false);
+    this.multiDragStart.set(null);
+    this.multiDragMoved.set(false);
+  }
+
+  clearMultiSelection() {
+    this.multiSelectedDates.set([]);
+    this.isMultiDragging.set(false);
+    this.multiDragStart.set(null);
+    this.multiDragMoved.set(false);
   }
 
   private dateKey(date: Date): string {
@@ -265,6 +318,55 @@ export class ScheduleComponent implements OnInit {
     // pad to full weeks
     while (cells.length % 7 !== 0) cells.push(null);
     return cells;
+  }
+
+  beginMultiDrag(date: Date) {
+    this.isMultiDragging.set(true);
+    this.multiDragStart.set(this.dateKey(date));
+    this.multiDragMoved.set(false);
+  }
+
+  dragMultiSelect(date: Date) {
+    if (!this.isMultiDragging() || !this.multiDragStart()) {
+      return;
+    }
+
+    const start = new Date(this.multiDragStart() + 'T00:00:00');
+    const end = new Date(date);
+
+    if (start.getTime() !== end.getTime() && !this.multiDragMoved()) {
+      this.multiDragMoved.set(true);
+    }
+
+    if (this.multiDragMoved()) {
+      this.setDragRangeSelection(start, end);
+    }
+  }
+
+  finishMultiDrag = () => {
+    const startKey = this.multiDragStart();
+    if (this.isMultiDragging() && startKey && !this.multiDragMoved()) {
+      const date = new Date(startKey + 'T00:00:00');
+      this.toggleMultiDate(date);
+    }
+
+    this.isMultiDragging.set(false);
+    this.multiDragStart.set(null);
+    this.multiDragMoved.set(false);
+  };
+
+  private setDragRangeSelection(startDate: Date, endDate: Date) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const from = new Date(Math.min(start.getTime(), end.getTime()));
+    const to = new Date(Math.max(start.getTime(), end.getTime()));
+    const mergedSelection = new Set(this.multiSelectedDates());
+
+    for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+      mergedSelection.add(this.dateKey(d));
+    }
+
+    this.multiSelectedDates.set([...mergedSelection].sort());
   }
 
   toggleMultiDate(date: Date) {
