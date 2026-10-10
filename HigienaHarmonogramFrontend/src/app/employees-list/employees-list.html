@@ -26,14 +26,14 @@
           <tr>
             <th>ID</th>
             <th>Employee ID</th>
-            <th>Imię</th>
+            <th>Imię </th>
             <th>Nazwisko</th>
             <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
-          <tr 
-            *ngFor="let employee of employees()" 
+          <tr
+            *ngFor="let employee of employees()"
             class="employee-row"
             [routerLink]="['/employee', employee.id]">
             <td class="cell-id">{{ employee.id }}</td>
@@ -62,7 +62,8 @@
 </div>
 
 <!-- Modal -->
-<div *ngIf="showModal()" class="modal-overlay" (click)="closeModal()">
+@if(showModal()){
+<div class="modal-overlay" (click)="closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>{{ editingEmployeeId() !== null ? 'Edytuj pracownika' : 'Dodaj nowego pracownika' }}</h2>
@@ -145,4 +146,5 @@
     </form>
   </div>
 </div>
+}
 

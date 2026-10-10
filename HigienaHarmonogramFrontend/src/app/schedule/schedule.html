@@ -10,24 +10,31 @@
     </div>
   </div>
 
-  <div *ngIf="isLoading()" class="loading">
+  @if (isLoading()){
+  <div class="loading">
     <p>Ładowanie harmonogramu...</p>
   </div>
+  }
 
-  <div *ngIf="error()" class="error">
+  @if(error()){
+  <div class="error">
     <p>{{ error() }}</p>
   </div>
+  }
 
-  <div *ngIf="!isLoading() && !error()" class="schedule-table-wrapper">
+  @if(!isLoading() && !error()){
+  <div class="schedule-table-wrapper">
     <table class="schedule-table">
       <thead>
         <tr>
           <th class="employee-column">Pracownik</th>
           <th class="actions-column">Akcje</th>
+
           <th *ngFor="let day of currentWeekDates; let i = index" class="day-header">
             <div class="day-title">{{ weekDays[i] }}</div>
             <div class="day-date">{{ formatDate(day) }}</div>
           </th>
+
         </tr>
       </thead>
       <tbody>
@@ -53,10 +60,11 @@
       </tbody>
     </table>
   </div>
-</div>
+}
 
 <!-- Multi-day modal -->
-<div *ngIf="showMultiDayModal()" class="modal-overlay" (click)="closeMultiDayModal()">
+  @if (showMultiDayModal()){
+<div  class="modal-overlay" (click)="closeMultiDayModal()">
   <div class="modal multi-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>{{ getSelectedEmployeeName() ? 'Dodaj zmiany wielodniowe dla ' + getSelectedEmployeeName() : 'Dodaj zmiany wielodniowe' }}</h2>
@@ -112,8 +120,10 @@
     </div>
   </div>
 </div>
+  }
 
-<div *ngIf="showShiftModal()" class="modal-overlay" (click)="closeShiftModal()">
+  @if (showShiftModal()){
+<div  class="modal-overlay" (click)="closeShiftModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>{{ isEditMode ? 'Edytuj zmianę' : 'Dodaj zmianę' }}</h2>
@@ -187,4 +197,6 @@
       </div>
     </form>
   </div>
+</div>
+  }
 </div>
