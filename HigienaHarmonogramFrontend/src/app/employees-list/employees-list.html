@@ -7,20 +7,29 @@
     </div>
   </div>
 
-  <div *ngIf="isLoading()" class="loading">
+  @if (isLoading()){
+  <div class="loading">
     <p>Ładowanie pracowników...</p>
   </div>
+  }
 
-  <div *ngIf="error()" class="error">
+  @if(error()){
+  <div class="error">
     <p>{{ error() }}</p>
   </div>
+  }
 
-  <div *ngIf="!isLoading() && !error()" class="employees-list">
-    <div *ngIf="employees().length === 0" class="no-employees">
-      <p>Brak pracowników w systemie</p>
-    </div>
+  @if(!isLoading() && !error()){
+  <div  class="employees-list">
 
-    <div *ngIf="employees().length > 0" class="list">
+    @if (employees().length === 0) {
+      <div  class="no-employees">
+        <p>Brak pracowników w systemie</p>
+      </div>
+    }
+
+    @if(employees().length > 0){
+    <div class="list">
       <table class="employees-table">
         <thead>
           <tr>
@@ -32,8 +41,8 @@
           </tr>
         </thead>
         <tbody>
+          @for (employee of employees();track employee.id){
           <tr
-            *ngFor="let employee of employees()"
             class="employee-row"
             [routerLink]="['/employee', employee.id]">
             <td class="cell-id">{{ employee.id }}</td>
@@ -55,10 +64,14 @@
               </button>
             </td>
           </tr>
+          }
         </tbody>
       </table>
     </div>
+    }
   </div>
+  }
+
 </div>
 
 <!-- Modal -->
@@ -113,13 +126,18 @@
         <div class="form-photo">
           <label for="employeePhoto">Zdjęcie pracownika</label>
           <div class="photo-picker">
+
+            @if (photoPreview()){
             <img
-              *ngIf="photoPreview()"
-              [src]="photoPreview()"
+              [src] = "photoPreview()"
               alt="Podgląd zdjęcia pracownika"
               class="photo-preview"
             />
-            <div *ngIf="!photoPreview()" class="photo-placeholder">📷</div>
+            }
+
+            @if(!photoPreview()){
+            <div class="photo-placeholder">📷</div>
+            }
 
             <div class="upload-control">
               <input

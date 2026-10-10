@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -8,7 +8,7 @@ import { HttpService } from '../servies/HttpService';
 @Component({
   selector: 'app-employees-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NgOptimizedImage],
   templateUrl: './employees-list.html',
   styleUrl: './employees-list.css'
 })
@@ -153,7 +153,7 @@ export class EmployeesListComponent implements OnInit {
 
   deleteEmployee(employeeId: number) {
     const confirmed = confirm('Czy na pewno chcesz usunąć tego pracownika?');
-    
+
     if (!confirmed) {
       return;
     }
